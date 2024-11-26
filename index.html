@@ -1,103 +1,550 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <div class="my_dataviz-flex">
-    <!-- Load d3.js -->
-    <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
-    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.1.3/Tone.js"></script>
+  <button id="exportButton">Exportar SVG</button>
+  <!-- Load d3.js -->
+  <script src="https://d3js.org/d3.v4.js"></script>
+  <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+  <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/15.1.3/Tone.js"></script>
 
-    <link rel="stylesheet" href="chart.css">
+  <link rel="stylesheet" href="chart.css">
 
-    <!-- Map container -->
-    <svg id="my_dataviz" width="1000" height="600"></svg>
-
-    <!-- Modal for country details -->
-    <div id="country_modal" class="modal" style="display: none;">
-        <div class="modal-content">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="country_details"></div>
-        </div>
-    </div>
-    <div class="footer">
-      
+  <!-- Map container -->
+  <svg id="my_dataviz" width="1000" height="600"></svg>
+  <div class="footer">
+    
 </div>
 
 
 <script>
+
+var nombreEspanol = {
+        "Afghanistan": "Afganistan",
+        "Africa": "Africa",
+        "Albania": "Albania",
+        "Algeria": "Argelia",
+        "Andorra": "Andorra",
+        "Angola": "Angola",
+        "Antigua and Barbuda": "Antigua y Barbuda",
+        "Argentina": "Argentina",
+        "Armenia": "Armenia",
+        "Asia": "Asia",
+        "Australia": "Australia",
+        "Austria": "Austria",
+        "Azerbaijan": "Azerbaiyan",
+        "Bahamas": "Bahamas",
+        "Bahrain": "Barein",
+        "Bangladesh": "Banglades",
+        "Barbados": "Barbados",
+        "Belarus": "Bielorrusia",
+        "Belgium": "Belgica",
+        "Belize": "Belice",
+        "Benin": "Benin",
+        "Bhutan": "Butan",
+        "Bolivia": "Bolivia",
+        "Bosnia and Herzegovina": "Bosnia y Herzegovina",
+        "Botswana": "Botsuana",
+        "Brazil": "Brasil",
+        "Brunei": "Brunei",
+        "Bulgaria": "Bulgaria",
+        "Burkina Faso": "Burkina Faso",
+        "Burundi": "Burundi",
+        "Cambodia": "Camboya",
+        "Cameroon": "Camerun",
+        "Canada": "Canada",
+        "Cape Verde": "Cabo Verde",
+        "Central African Republic": "Republica Centroafricana",
+        "Chad": "Chad",
+        "Chile": "Chile",
+        "China": "China",
+        "Colombia": "Colombia",
+        "Comoros": "Comoras",
+        "Congo": "Congo",
+        "Cook Islands": "Islas Cook",
+        "Costa Rica": "Costa Rica",
+        "Cote d'Ivoire": "Costa de Marfil",
+        "Croatia": "Croacia",
+        "Cuba": "Cuba",
+        "Cyprus": "Chipre",
+        "Czechia": "Chequia",
+        "Democratic Republic of Congo": "Republica Democratica del Congo",
+        "Denmark": "Dinamarca",
+        "Djibouti": "Yibuti",
+        "Dominica": "Dominica",
+        "Dominican Republic": "Republica Dominicana",
+        "East Timor": "Timor Oriental",
+        "Ecuador": "Ecuador",
+        "Egypt": "Egipto",
+        "El Salvador": "El Salvador",
+        "Equatorial Guinea": "Guinea Ecuatorial",
+        "Eritrea": "Eritrea",
+        "Estonia": "Estonia",
+        "Eswatini": "Esuatini",
+        "Ethiopia": "Etiopia",
+        "Europe": "Europa",
+        "European Union (27)": "Union Europea (27)",
+        "Fiji": "Fiyi",
+        "Finland": "Finlandia",
+        "France": "Francia",
+        "Gabon": "Gabon",
+        "Gambia": "Gambia",
+        "Georgia": "Georgia",
+        "Germany": "Alemania",
+        "Ghana": "Ghana",
+        "Greece": "Grecia",
+        "Grenada": "Granada",
+        "Guatemala": "Guatemala",
+        "Guinea": "Guinea",
+        "Guinea-Bissau": "Guinea-Bisau",
+        "Guyana": "Guyana",
+        "Haiti": "Haiti",
+        "High-income countries": "Paises de ingresos altos",
+        "Honduras": "Honduras",
+        "Hungary": "Hungria",
+        "Iceland": "Islandia",
+        "India": "India",
+        "Indonesia": "Indonesia",
+        "Iran": "Iran",
+        "Iraq": "Irak",
+        "Ireland": "Irlanda",
+        "Israel": "Israel",
+        "Italy": "Italia",
+        "Jamaica": "Jamaica",
+        "Japan": "Japon",
+        "Jordan": "Jordania",
+        "Kazakhstan": "Kazajistan",
+        "Kenya": "Kenia",
+        "Kiribati": "Kiribati",
+        "Kuwait": "Kuwait",
+        "Kyrgyzstan": "Kirguistan",
+        "Laos": "Laos",
+        "Latvia": "Letonia",
+        "Lebanon": "Libano",
+        "Lesotho": "Lesoto",
+        "Liberia": "Liberia",
+        "Libya": "Libia",
+        "Liechtenstein": "Liechtenstein",
+        "Lithuania": "Lituania",
+        "Low-income countries": "Paises de ingresos bajos",
+        "Lower-middle-income countries": "Paises de ingresos medianos bajos",
+        "Luxembourg": "Luxemburgo",
+        "Madagascar": "Madagascar",
+        "Malawi": "Malaui",
+        "Malaysia": "Malasia",
+        "Maldives": "Maldivas",
+        "Mali": "Mali",
+        "Malta": "Malta",
+        "Marshall Islands": "Islas Marshall",
+        "Mauritania": "Mauritania",
+        "Mauritius": "Mauricio",
+        "Mexico": "Mexico",
+        "Micronesia (country)": "Micronesia",
+        "Moldova": "Moldavia",
+        "Mongolia": "Mongolia",
+        "Montenegro": "Montenegro",
+        "Morocco": "Marruecos",
+        "Mozambique": "Mozambique",
+        "Myanmar": "Birmania",
+        "Namibia": "Namibia",
+        "Nauru": "Nauru",
+        "Nepal": "Nepal",
+        "Netherlands": "Paises Bajos",
+        "New Zealand": "Nueva Zelanda",
+        "Nicaragua": "Nicaragua",
+        "Niger": "Niger",
+        "Nigeria": "Nigeria",
+        "Niue": "Niue",
+        "North America": "America del Norte",
+        "North Korea": "Corea del Norte",
+        "North Macedonia": "Macedonia del Norte",
+        "Norway": "Noruega",
+        "Oceania": "Oceania",
+        "Oman": "Oman",
+        "Pakistan": "Pakistan",
+        "Palau": "Palaos",
+        "Panama": "Panama",
+        "Papua New Guinea": "Papua Nueva Guinea",
+        "Paraguay": "Paraguay",
+        "Peru": "Peru",
+        "Philippines": "Filipinas",
+        "Poland": "Polonia",
+        "Portugal": "Portugal",
+        "Qatar": "Catar",
+        "Romania": "Rumania",
+        "Russia": "Rusia",
+        "Rwanda": "Ruanda",
+        "Saint Kitts and Nevis": "San Cristobal y Nieves",
+        "Saint Lucia": "Santa Lucia",
+        "Saint Vincent and the Grenadines": "San Vicente y las Granadinas",
+        "Samoa": "Samoa",
+        "Sao Tome and Principe": "Santo Tome y Principe",
+        "Saudi Arabia": "Arabia Saudita",
+        "Senegal": "Senegal",
+        "Serbia": "Serbia",
+        "Seychelles": "Seychelles",
+        "Sierra Leone": "Sierra Leona",
+        "Singapore": "Singapur",
+        "Slovakia": "Eslovaquia",
+        "Slovenia": "Eslovenia",
+        "Solomon Islands": "Islas Salomon",
+        "Somalia": "Somalia",
+        "South Africa": "Sudafrica",
+        "South America": "America del Sur",
+        "South Korea": "Corea del Sur",
+        "South Sudan": "Sudan del Sur",
+        "Spain": "Espana",
+        "Sri Lanka": "Sri Lanka",
+        "Sudan": "Sudan",
+        "Suriname": "Surinam",
+        "Sweden": "Suecia",
+        "Switzerland": "Suiza",
+        "Syria": "Siria",
+        "Tajikistan": "Tayikistan",
+        "Tanzania": "Tanzania",
+        "Thailand": "Tailandia",
+        "Togo": "Togo",
+        "Tonga": "Tonga",
+        "Trinidad and Tobago": "Trinidad y Tobago",
+        "Tunisia": "Tunez",
+        "Turkey": "Turquia",
+        "Turkmenistan": "Turkmenistan",
+        "Tuvalu": "Tuvalu",
+        "Uganda": "Uganda",
+        "Ukraine": "Ucrania",
+        "United Arab Emirates": "Emiratos Arabes Unidos",
+        "United Kingdom": "Reino Unido",
+        "United States": "Estados Unidos",
+        "Upper-middle-income countries": "Paises de ingresos medianos altos",
+        "Uruguay": "Uruguay",
+        "Uzbekistan": "Uzbekistan",
+        "Vanuatu": "Vanuatu",
+        "Venezuela": "Venezuela",
+        "Vietnam": "Vietnam",
+        "World": "Mundo",
+        "Yemen": "Yemen",
+        "Zambia": "Zambia",
+        "Zimbabwe": "Zimbabue"
+};
+
+
 // The svg
 var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height");
+  width = +svg.attr("width"),
+  height = +svg.attr("height");
 
 // Map and projection
 var projection = d3.geoNaturalEarth1()
-    .scale(width / 1.6 / Math.PI)
-    .translate([width / 2, height / 1.8]);  
+  .scale(width / 1.6 / Math.PI)
+  .translate([width / 2, height / 1.8]);  
 
 var path = d3.geoPath().projection(projection);
 
 // Define color scale for CO2 emissions per capita
 var colorScale = d3.scaleSequential(d3.interpolateGreys)
-    .domain([0, 20]);
+  .domain([0, 20]);
 
 // Map country name differences
 var countryNameMap = {
-    "USA": "United States",
-    "Democratic Republic of the Congo": "Democratic Republic of Congo",
-    "Republic of the Congo": "Congo",
-    "Republic of Serbia": "Serbia",
-    "Greenland" : "Denmark",
-    "United Republic of Tanzania": "Tanzania",
-    "England": "United Kingdom",
-    "Macedonia": "North Macedonia",
-    "Czech Republic":"Czechia",
-    "Ivory Coast":"Cote d'Ivoire"
+  "USA": "United States",
+  "Democratic Republic of the Congo": "Democratic Republic of Congo",
+  "Republic of the Congo": "Congo",
+  "Republic of Serbia": "Serbia",
+  "Greenland" : "Denmark",
+  "United Republic of Tanzania": "Tanzania",
+  "England": "United Kingdom",
+  "Macedonia": "North Macedonia",
+  "Czech Republic":"Czechia",
+  "Ivory Coast":"Cote d'Ivoire"
 };
 
+document.getElementById("exportButton").addEventListener("click", exportSVG);
 // Function to normalize country name
 function normalizeCountryName(geoJsonName) {
-    return countryNameMap[geoJsonName] || geoJsonName;
+  return countryNameMap[geoJsonName] || geoJsonName;
 }
 
+// GHG emissions data
+var ghgData = {
+  "ghg_per_capita": {
+    "Afghanistan": 0.762,
+    "Africa": 2.821,
+    "Albania": 3.052,
+    "Algeria": 6.609,
+    "Andorra": 8.25,
+    "Angola": 3.965,
+    "Antigua and Barbuda": 13.243,
+    "Argentina": 8.915,
+    "Armenia": 3.545,
+    "Asia": 5.629,
+    "Australia": 23.997,
+    "Austria": 7.86,
+    "Azerbaijan": 5.169,
+    "Bahamas": 7.86,
+    "Bahrain": 36.414,
+    "Bangladesh": 1.436,
+    "Barbados": 13.526,
+    "Belarus": 6.753,
+    "Belgium": 9.402,
+    "Belize": 17.605,
+    "Benin": 2.098,
+    "Bhutan": 0.469,
+    "Bolivia": 11.779,
+    "Bosnia and Herzegovina": 7.29,
+    "Botswana": 20.938,
+    "Brazil": 6.854,
+    "Brunei": 21.983,
+    "Bulgaria": 2.479,
+    "Burkina Faso": 2.688,
+    "Burundi": 0.677,
+    "Cambodia": 4.428,
+    "Cameroon": 4.84,
+    "Canada": 20.635,
+    "Cape Verde": 1.3,
+    "Central African Republic": 8.942,
+    "Chad": 6.553,
+    "Chile": 2.906,
+    "China": 8.479,
+    "Colombia": 5.39,
+    "Comoros": 0.885,
+    "Congo": 5.398,
+    "Cook Islands": 5.837,
+    "Costa Rica": 1.668,
+    "Cote d'Ivoire": 1.97,
+    "Croatia": 4.339,
+    "Cuba": 3.375,
+    "Cyprus": 6.746,
+    "Czechia": 10.513,
+    "Democratic Republic of Congo": 7.559,
+    "Denmark": 7.602,
+    "Djibouti": 1.285,
+    "Dominica": 3.079,
+    "Dominican Republic": 3.654,
+    "East Timor": 4.983,
+    "Ecuador": 5.691,
+    "Egypt": 3.332,
+    "El Salvador": 2.216,
+    "Equatorial Guinea": 9.813,
+    "Eritrea": 1.938,
+    "Estonia": 11.175,
+    "Eswatini": 2.3,
+    "Ethiopia": 1.607,
+    "Europe": 7.849,
+    "European Union (27)": 7.077,
+    "Fiji": -0.174,
+    "Finland": 10.58,
+    "France": 5.467,
+    "Gabon": 8.775,
+    "Gambia": 1.14,
+    "Georgia": 4.678,
+    "Germany": 8.662,
+    "Ghana": 0.404,
+    "Greece": 7.557,
+    "Grenada": 19.473,
+    "Guatemala": 2.25,
+    "Guinea": 3.154,
+    "Guinea-Bissau": 2.137,
+    "Guyana": 24.788,
+    "Haiti": 0.997,
+    "High-income countries": 11.627,
+    "Honduras": 2.826,
+    "Hungary": 6.394,
+    "Iceland": 7.678,
+    "India": 2.432,
+    "Indonesia": 7.269,
+    "Iran": 10.325,
+    "Iraq": 7.731,
+    "Ireland": 11.985,
+    "Israel": 10.137,
+    "Italy": 6.298,
+    "Jamaica": 3.607,
+    "Japan": 9.018,
+    "Jordan": 3.418,
+    "Kazakhstan": 14.486,
+    "Kenya": 1.441,
+    "Kiribati": 0.966,
+    "Kuwait": 30.778,
+    "Kyrgyzstan": 2.157,
+    "Laos": 5.466,
+    "Latvia": 4.659,
+    "Lebanon": 6.076,
+    "Lesotho": 1.137,
+    "Liberia": 3.183,
+    "Libya": 19.286,
+    "Liechtenstein": 4.156,
+    "Lithuania": 6.423,
+    "Low-income countries": 1.85,
+    "Lower-middle-income countries": 3.234,
+    "Luxembourg": 16.452,
+    "Madagascar": 1.461,
+    "Malawi": 1.025,
+    "Malaysia": 12.075,
+    "Maldives": 5.153,
+    "Mali": 2.147,
+    "Malta": 4.229,
+    "Marshall Islands": 5.14,
+    "Mauritania": 3.013,
+    "Mauritius": 5.269,
+    "Mexico": 5.363,
+    "Micronesia (country)": 2.065,
+    "Moldova": 4.342,
+    "Mongolia": 18.299,
+    "Montenegro": 6.123,
+    "Morocco": 2.511,
+    "Mozambique": 3.524,
+    "Myanmar": 4.58,
+    "Namibia": 8.673,
+    "Nauru": 5.758,
+    "Nepal": 1.678,
+    "Netherlands": 9.998,
+    "New Zealand": 14.638,
+    "Nicaragua": 5.764,
+    "Niger": 1.875,
+    "Nigeria": 1.743,
+    "Niue": 5.147,
+    "North America": 12.728,
+    "North Korea": 3.211,
+    "North Macedonia": 5.326,
+    "Norway": 5.045,
+    "Oceania": 18.336,
+    "Oman": 21.787,
+    "Pakistan": 1.968,
+    "Palau": 16.166,
+    "Panama": 5.978,
+    "Papua New Guinea": 6.651,
+    "Paraguay": 14.793,
+    "Peru": 5.808,
+    "Philippines": 2.145,
+    "Poland": 8.319,
+    "Portugal": 5.996,
+    "Qatar": 40.88,
+    "Romania": 4.013,
+    "Russia": 13.207,
+    "Rwanda": 0.545,
+    "Saint Kitts and Nevis": 7.332,
+    "Saint Lucia": 4.143,
+    "Saint Vincent and the Grenadines": 3.24,
+    "Samoa": 3.728,
+    "Sao Tome and Principe": 1.864,
+    "Saudi Arabia": 20.184,
+    "Senegal": 2.1,
+    "Serbia": 8.358,
+    "Seychelles": 7.472,
+    "Sierra Leone": 1.174,
+    "Singapore": 11.465,
+    "Slovakia": 6.784,
+    "Slovenia": 7.956,
+    "Solomon Islands": 68.681,
+    "Somalia": 2.66,
+    "South Africa": 9.678,
+    "South America": 7.164,
+    "South Korea": 12.599,
+    "South Sudan": 5.774,
+    "Spain": 6.218,
+    "Sri Lanka": 1.751,
+    "Sudan": 2.939,
+    "Suriname": 23.038,
+    "Sweden": 2.909,
+    "Switzerland": 5.161,
+    "Syria": 2.412,
+    "Tajikistan": 1.861,
+    "Tanzania": 2.587,
+    "Thailand": 6.131,
+    "Togo": 1.057,
+    "Tonga": 2.953,
+    "Trinidad and Tobago": 18.731,
+    "Tunisia": 3.138,
+    "Turkey": 5.509,
+    "Turkmenistan": 25.547,
+    "Tuvalu": 2.731,
+    "Uganda": 1.377,
+    "Ukraine": 5.005,
+    "United Arab Emirates": 26.439,
+    "United Kingdom": 6.426,
+    "United States": 17.262,
+    "Upper-middle-income countries": 8.153,
+    "Uruguay": 10.022,
+    "Uzbekistan": 5.622,
+    "Vanuatu": 2.858,
+    "Venezuela": 10.341,
+    "Vietnam": 4.574,
+    "World": 6.408,
+    "Yemen": 0.801,
+    "Zambia": 4.97,
+    "Zimbabwe": 7.682
+  }
+};
 
-// Close modal function
-function closeModal() {
-    document.getElementById("country_modal").style.display = "none";
+function TextToSpeech() {
+  this.play = function(text) {
+    var synth = window.speechSynthesis;
+    var utterThis = new SpeechSynthesisUtterance(text);
+    synth.speak(utterThis);
+  };
 }
 
-// Load world map and CO2 emissions data
+var textToSpeech = new TextToSpeech();
+
+// Load world map data
 d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", function(worldData) {
   // Filter out Antarctica
   worldData.features = worldData.features.filter(function(d) {
-    return d.properties.name !== "Antarctica";
+  return d.properties.name !== "Antarctica";
   });
 
-  d3.json("./countries_data_2.json", function(gdpData) {
-
-    // Draw the map
-    svg.append("g")
-      .selectAll("path")
-      .data(worldData.features)
-      .enter().append("path")
-      .attr("d", path)
-      .style("fill", "#fff") // Relleno blanco
-      .style("stroke", "#000") // Bordes negros
-      .style("cursor", "pointer") // Cambiar el cursor a puntero
-      .on("mouseover", function(d) {  // Evento de hover
-          var countryName = normalizeCountryName(d.properties.name);
-        })
-      .append("title")
-      .text(function(d) {
-        var countryName = normalizeCountryName(d.properties.name);
-        var ghgPerCapita = gdpData["ghg_per_capita"][countryName];
-        console.log(countryName + ": " + (ghgPerCapita ? ghgPerCapita + " Toneladas de gases de efecto invernadero per cápita" : "No data"))
-        return countryName + ": " + (ghgPerCapita ? ghgPerCapita + " Toneladas de gases de efecto invernadero per cápita" : "No data");
-      });
+  // Draw the map
+  svg.append("g")
+  .selectAll("path")
+  .data(worldData.features)
+  .enter().append("path")
+  .attr("d", path)
+  .attr("id", function(d) { return  d.properties.name.replace(/\s+/g, '-'); }) // Add id
+  .attr("data-info", function (d) {  // Agregar información como atributo
+    var countryName = normalizeCountryName(d.properties.name);
+    var ghgPerCapita = ghgData["ghg_per_capita"][countryName];
+    var nombre_pais = nombreEspanol[countryName] || countryName;
+    return nombre_pais + " produce " + (ghgPerCapita ? ghgPerCapita + " Toneladas de gases de efecto invernadero per capita" : "No data");
+  })
+  .style("fill", "#fff") // Relleno blanco
+  .style("stroke", "#000") // Bordes negros
+  .style("cursor", "pointer") // Cambiar el cursor a puntero
+  .on("mouseover", function(d) {  // Evento de hover
+    var countryName = normalizeCountryName(d.properties.name);
+    var ghgPerCapita = ghgData["ghg_per_capita"][countryName];
+    const texto = countryName + ": " + (ghgPerCapita ? ghgPerCapita + " Toneladas de gases de efecto invernadero per capita" : "No data")
+    textToSpeech.play(texto)
+    console.log(texto)
+  })
+  .append("title")
+  .text(function(d) {
+    var countryName = normalizeCountryName(d.properties.name);
+    var ghgPerCapita = ghgData["ghg_per_capita"][countryName];
+    var nombreEspanol = gdpData["nombre_pais"][countryName] || countryName;
+    return nombreEspanol + " genera " + (ghgPerCapita ? ghgPerCapita + "toneladas de gases de efecto invernadero per capita" : "No data");
   });
-
 });
 
+
+function exportSVG() {
+    // Seleccionar el elemento SVG
+    var svgElement = document.querySelector("svg");
+
+    // Extraer el contenido como texto
+    var svgContent = svgElement.outerHTML;
+
+    // Crear un blob para el archivo SVG
+    var blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
+
+    // Crear un enlace de descarga
+    var link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "mapa_ghg.svg";
+
+    // Simular clic para descargar
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 
 </script>
 
