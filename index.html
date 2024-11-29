@@ -487,6 +487,8 @@ var textToSpeech = new TextToSpeech();
 
 // Load world map data
 d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson", function(worldData) {
+  d3.json("./countries_data_2.json", function(gdpData) {
+  
   // Filter out Antarctica
   worldData.features = worldData.features.filter(function(d) {
   return d.properties.name !== "Antarctica";
@@ -505,6 +507,34 @@ d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/w
     var nombre_pais = nombreEspanol[countryName] || countryName;
     return nombre_pais + " produce " + (ghgPerCapita ? ghgPerCapita + " Toneladas de gases de efecto invernadero per capita" : "No data");
   })
+  .attr("mas-data-info", function (d) {  // Agregar información como atributo
+    var countryName = normalizeCountryName(d.properties.name);
+    var methane = gdpData["methane_per_capita"][countryName] || null;
+    var nitrousOxide = gdpData["nitrous_oxide_per_capita"][countryName] || null;
+    var co2 = gdpData["co2_per_capita"][countryName] || null;
+    var ghgTotal = gdpData["ghg_per_capita"][countryName] || null;
+    var otros = (ghgTotal - (methane + nitrousOxide + co2)) > 0 ? (ghgTotal - (methane + nitrousOxide + co2)) : 0;
+    var Total = methane + nitrousOxide + co2 + otros;
+    var data = [
+        { type: "Metano", value: methane, percentage: methane / Total * 100 },
+        { type: "oxido de nitrogeno", value: nitrousOxide, percentage: nitrousOxide / Total * 100 },
+        { type: "oxido de carbono", value: co2, percentage: co2 / Total * 100 },
+        { type: "Otros", value: otros > 0 ? otros : 0, percentage: otros > 0 ? otros / Total * 100 : 0 }
+    ];
+    data.sort((a, b) => b.percentage - a.percentage);
+    var distributionString = "Los gases de efecto invernadero se distribuyen en: ";
+    data.forEach(function(d, i) {
+      distributionString += d.type + " con un " + Math.round(d.percentage) + "%";
+      if (i < data.length - 1) {
+        if (i < data.length - 2) {
+          distributionString += ", ";
+        } else if (i === data.length - 2) {
+          distributionString += " y ";
+        }
+      }
+    });
+    return distributionString;
+    })
   .style("fill", "#fff") // Relleno blanco
   .style("stroke", "#000") // Bordes negros
   .style("cursor", "pointer") // Cambiar el cursor a puntero
@@ -520,9 +550,11 @@ d3.json("https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/w
     var countryName = normalizeCountryName(d.properties.name);
     var ghgPerCapita = ghgData["ghg_per_capita"][countryName];
     var nombreEspanol = gdpData["nombre_pais"][countryName] || countryName;
-    return nombreEspanol + " genera " + (ghgPerCapita ? ghgPerCapita + "toneladas de gases de efecto invernadero per capita" : "No data");
+    return nombreEspanol + " genera " + (ghgPerCapita ? ghgPerCapita + " toneladas de gases de efecto invernadero per capita" : "No data");
   });
 });
+})
+
 
 
 function exportSVG() {
@@ -544,6 +576,7 @@ function exportSVG() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    
 }
 
 </script>
