@@ -1,5 +1,5 @@
-import Protobject from './js/protobject.js';
 import TextToSpeech from './js/textToSpeech.js';
+import Protobject from './js/protobject.js';
 
 document.body.innerHTML = `
   <style>
@@ -561,6 +561,7 @@ var stateName = "";
 
 // Función que recibe datos (coordenadas x, y) y actualiza la posición del triángulo en el mapa
 Protobject.onReceived((data) => {
+  console.log("proto objectt", data)
     // Mapea el valor de data.y, que va de 0.2 a 0.8, al rango de 0 a 600 píxeles para el movimiento vertical
     let cursorTop = mapValue(data.y, 0.2, 0.8, 0, 600);
     triangle.style.top = cursorTop + 'px'; // Actualiza la posición vertical del triángulo
@@ -581,15 +582,21 @@ function activateHover(x, y) {
     // Si el elemento es un <path> (que representa un estado en el SVG), obtenemos su id
     if (state && state.tagName === 'path') {
         stateName = state.getAttribute('id');
+      	console.log("state", stateName)
     }
+
 
     // Si el estado detectado es diferente al anterior y no es undefined, procesa el nuevo estado
-    if (stateName != oldStateName && stateName != undefined) {
-        var texto = state.getAttribute("data-info")
-        console.log(state.getAttribute("data-info")); // Muestra en consola el estado seleccionado
-        oldStateName = stateName; // Actualiza el estado anterior con el nuevo
+if (stateName != oldStateName && stateName != undefined && stateName != "") {
+    var texto = state.getAttribute("data-info").trim(); // Eliminar posibles espacios en blanco
+    console.log("Texto:", texto); // Verifica que no sea vacío
 
-        // Recorre los datos para encontrar el estado por su código y reproduce una descripción por audio
-        TextToSpeech.play(texto);
+    if (texto !== "") { // Solo reproduce si el texto no está vacío
+        oldStateName = stateName; // Actualiza el estado anterior con el nuevo
+        TextToSpeech.play("es-CL", texto); // Reproduce la descripción
+    } else {
+        console.log("Texto vacío, no se puede reproducir.");
     }
+}
+
 }

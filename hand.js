@@ -18,6 +18,7 @@ HandSensor.flip(false);
 // El punto 8 corresponde al dedo índice
 // Enviar la posición del índice a 'main.js'
 HandSensor.onData((data) => {
+  console.log("Data",data)
     if (data.landmarks && data.landmarks[0] && data.landmarks[0][8]) {
         Protobject.send(data.landmarks[0][8]).to('main.js');
     }
